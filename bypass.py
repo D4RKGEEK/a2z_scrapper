@@ -130,3 +130,36 @@ def check_url_size(url):
 
 
 
+
+def uploadrar_direct(url):
+    segments = url.split("/")
+    fileid = segments[-1]
+    url = f"https://uploadrar.com/{fileid}"
+
+    payload = f'adblock_detected=0&id={fileid}&method_free=Free%20Download&method_premium=&op=download2&rand=&referer=https%3A%2F%2Fforum.mobilism.org%2F'
+    headers = {
+        'sec-ch-ua': '"Not/A)Brand";v="99", "Google Chrome";v="115", "Chromium";v="115"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'Upgrade-Insecure-Requests': '1',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-User': '?1',
+        'Sec-Fetch-Dest': 'document',
+        'host': 'uploadrar.com',
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    # Parse the HTML using BeautifulSoup
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Find the <a> tag inside the <span> with id="direct_link"
+    a_tag = soup.find('span', {'id': 'direct_link'}).find('a')
+
+    # Get the href attribute value
+    href_value = a_tag['href']
+
+    return href_value
