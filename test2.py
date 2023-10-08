@@ -9,7 +9,6 @@ import urllib.parse
 def download_file(folder, url, base_file_name):
     try:
         response = requests.get(url, verify=False)
-        print(response)
         if response.status_code == 200:
             current_month = datetime.now().strftime('%B')
             db_folder = 'DB'
@@ -56,7 +55,7 @@ def apk_downloader():
                                 link = data["dl_links"]
                                 older_name = data["app_name"] + " " + data[
                                     "app_version"] + " Premium MOD Apk [APKISM.COM]"
-                                status = download_file(folder_name, link)
+                                status = download_file(folder_name, link, base_file_name)
                                 if status is True:
                                     data["apk_path"] = os.path.join(os.getcwd(), day_folder, folder_name,
                                                                     os.path.basename(link))
