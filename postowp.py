@@ -209,6 +209,8 @@ If you're looking for an unlocked version of {name}, the {name} MOD APK is a gre
             ss1 = screenshots[1]
             ss2 = screenshots[2]
             ss3 = screenshots[3]
+            ss4 = screenshots[4]
+            ss5 = screenshots[5]
 
             if video is not None:
                 yt = youtube_parser(video)
@@ -333,7 +335,10 @@ If you're looking for an unlocked version of {name}, the {name} MOD APK is a gre
             datos_imagenes = [
                 f'{ss1}=h300',
                 f'{ss2}=h300',
-                f'{ss3}=h300'
+                f'{ss3}=h300',
+                f'{ss4}=h300',
+                f'{ss5}=h300'
+
             ]
 
             post.custom_fields.append({
