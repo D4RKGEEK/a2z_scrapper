@@ -21,12 +21,23 @@ current_date = datetime.now().strftime("%b, %d, %Y")
 def parse_version(version_string):
     return tuple(map(int, version_string.split('.')))
 
+
 def youtube_parser(url):
     reg_exp = r'^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*'
     match = re.match(reg_exp, url)
-    return match.group(7) if match and len(match.group(7)) == 11 else False
+    return match.group(7) if match and len(match.group(7)) == 11 else None
 
-def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
+
+def playstore_post(data, is_update=False, existing_post_id=None, non_play=None):
+    if is_update:
+        update_status = True
+    else:
+        update_staus = False
+
+    if existing_post_id is not None:
+        existing_post_id = existing_post_id
+    else:
+        existing_post_id = None
     meaningful_id = data["id"]
     post_title = data["title"]
     post_link = data["link"]
@@ -119,7 +130,6 @@ If you're looking for an unlocked version of {name}, the {name} MOD APK is a gre
         post.post_status = 'publish'
         post.custom_fields = []
 
-
         datos_download = {
             'option': 'links',
             'type': 'apk',
@@ -160,7 +170,6 @@ If you're looking for an unlocked version of {name}, the {name} MOD APK is a gre
             'value': datos_informacion
         })
 
-
         if is_update:
             print(existing_post_id)
             post.id = wp.call(posts.EditPost(existing_post_id, post))
@@ -170,208 +179,212 @@ If you're looking for an unlocked version of {name}, the {name} MOD APK is a gre
             print(post.id)
             return version, post.id, post.slug, img_link
 
-
     if str(play_store_id).startswith("http"):
         temp = play_store_id.split("=")[1].split("&")[0]
-        result = app(
-            temp,
-            lang='en',
-            country='us'
-        )
-        name = app_name
-        version = app_version
-        mod = app_mod
-        size = apksize
-        mod_info = mod_info
-        desp = result["descriptionHTML"]
-        rated = result["score"]
-        install = result["installs"]
-        cat = result["genre"]
-        img = result["icon"] + "=s200-rw"
-        playstore_link = result["url"]
-        video = result["video"]
-        screenshots = result["screenshots"]
-        ss1 = screenshots[1]
-        ss2 = screenshots[2]
-        ss3 = screenshots[3]
+        result = None
+        try:
+            result = app(
+                temp,
+                lang='en',
+                country='us'
+            )
+            # The rest of the code for handling the result goes here
+        except Exception as e:
+            playstore_post(data, is_update=update_staus, existing_post_id=existing_post_id, non_play=True)
 
+        if result is not None:
+            name = app_name
+            version = app_version
+            mod = app_mod
+            size = apksize
+            mod_info = mod_info
+            desp = result["descriptionHTML"]
+            rated = result["score"]
+            install = result["installs"]
+            cat = result["genre"]
+            img = result["icon"] + "=s200-rw"
+            playstore_link = result["url"]
+            video = result["video"]
+            screenshots = result["screenshots"]
+            ss1 = screenshots[1]
+            ss2 = screenshots[2]
+            ss3 = screenshots[3]
 
-        if video is not None:
-            yt = youtube_parser(video)
+            if video is not None:
+                yt = youtube_parser(video)
 
-        banner = result["headerImage"]
-        dev = result["developer"]
-        shortdesp = result["summary"]
-        ratings = result["ratings"]
-        ss = (result["screenshots"])
-        catergory = result['genre']
-        video = result['video']
-        whatsnew = "Bug Fixes"
-        cover = result['headerImage']
-        icon = result['icon']
-        ratings = result['ratings']
-        installs = result['installs']
-        play_id = result['appId']
-        vote = result['score']
+            banner = result["headerImage"]
+            dev = result["developer"]
+            shortdesp = result["summary"]
+            ratings = result["ratings"]
+            ss = (result["screenshots"])
+            catergory = result['genre']
+            video = result['video']
+            whatsnew = "Bug Fixes"
+            cover = result['headerImage']
+            icon = result['icon']
+            ratings = result['ratings']
+            installs = result['installs']
+            play_id = result['appId']
+            vote = result['score']
 
-        wp_url = "https://apkism.com/xmlrpc.php"
-        wp_username = "test"
-        wp_password = "test"
-        wp = Client(wp_url, wp_username, wp_password)
-        post = WordPressPost()
-        img2 = requests.get(result["icon"] + "=s200-rw")
-        data = {
-            'name': f'{name} + MOD APK.jpg',
-            'type': 'image/jpeg',
-            'bits': xmlrpc_client.Binary(img2.content),
-        }
-        response = wp.call(media.UploadFile(data))
-        thumbnail_id = response['id']
-        post.thumbnail = thumbnail_id
-        post.title = name + " Mod APK " + version + " (" + mod + ") "
-        title = post_title
-        thumbnail_url = (response["url"])
-        post.slug = slugify(name + " Mod APK")
-        #
-        post.terms_names = {
-            'post_tag': [name + " Mod"],
-            'category': [f'{catergory}'],
-        }
-        cat_link = slugify(cat)
-        desp = scrap_content
-
-        post.content = f"""
-                                  <h1 style="text-align: center;">{title}</h1>
-
-         <p style="text-align: center;"><strong>Download The Latest Apk Version of {name} MOD, A <a href="https://apkism.com/category/{cat_link}">{cat}</a> App For Android Device. This MOD Includes {mod} Features Unlocked. Download Yours Now!</strong></p>
-
-        <h2>What is {name} MOD APK?</h2>
-        {name} MOD APK is an unofficial app that provides modifications or enhancements to the normal {name} experience on Android devices. This MOD includes {mod} features unlocked, such as additional content, new levels, and premium features.
-
-        <h2>About {name}</h2>
-        {desp}
-
-        <h2>Features of {name} MOD APK</h2>
-
-        No Ads: Unlike the standard version, {name} MOD APK removes all commercial content, providing an uninterrupted experience.
-        More Features: Enjoy unlocked features and enhanced app experience.
-        {mod} Unlocked: Access premium features without any restrictions.
-
-
-        <h2>Download {name} MOD APK Latest Version</h2>
-        You can download the MOD APK file for {name} with all {mod} features unlocked from our website. This version allows you to access all the app's content without any subscription fees.
-
-        To install the MOD APK file, follow these steps:
-
-   <ol>
-        <li>Download the APK file from our website.</li>
-        <li>On your Android device, go to Settings &gt; Security &gt; Unknown Sources and enable installation from unknown sources.</li>
-        <li>Locate the downloaded APK file and tap on it to begin the installation.</li>
-        <li>Follow the prompts to complete the installation.</li>
-        <li>Once installed, launch {name} and log in with your account details.</li>
-    </ol>
-        
-        
-        <h2>How to Install {name} MOD APK on PC</h2>
-        To install {name} MOD APK on your Windows PC, follow these steps:
-    <ol>
-        <li>Download and install BlueStacks software from a trusted source.</li>
-        <li>Download {name} MOD APK from our website.</li>
-        <li>Install the APK file using BlueStacks by following the provided steps.</li>
-        <li>Once installed, you can enjoy {name} MOD APK on your PC.</li>
-    </ol>
-        <h2>Conclusion</h2>
-        If you're looking for an unlocked version of {name}, the {name} MOD APK is a great choice. It provides access to all the app's content without any restrictions and comes with bug fixes and performance improvements for a smooth experience. Download now and enjoy!
-                                                    """
-        post.post_status = 'publish'
-        post.custom_fields = []
-
-        # dl_link
-        custom = {
-            '0': {
-                'title': 'test',
-                'content': 'test'
+            wp_url = "https://apkism.com/xmlrpc.php"
+            wp_username = "test"
+            wp_password = "test"
+            wp = Client(wp_url, wp_username, wp_password)
+            post = WordPressPost()
+            img2 = requests.get(result["icon"] + "=s200-rw")
+            data = {
+                'name': f'{name} + MOD APK.jpg',
+                'type': 'image/jpeg',
+                'bits': xmlrpc_client.Binary(img2.content),
             }
-        }
-        post.custom_fields.append({
-            'key': 'custom_boxes',
-            'value': custom
-        })
+            response = wp.call(media.UploadFile(data))
+            thumbnail_id = response['id']
+            post.thumbnail = thumbnail_id
+            post.title = name + " Mod APK " + version + " (" + mod + ") "
+            title = post_title
+            thumbnail_url = (response["url"])
+            post.slug = slugify(name + " Mod APK")
+            #
+            post.terms_names = {
+                'post_tag': [name + " Mod"],
+                'category': [f'{catergory}'],
+            }
+            cat_link = slugify(cat)
+            desp = scrap_content
+
+            post.content = f"""
+                                      <h1 style="text-align: center;">{title}</h1>
+
+             <p style="text-align: center;"><strong>Download The Latest Apk Version of {name} MOD, A <a href="https://apkism.com/category/{cat_link}">{cat}</a> App For Android Device. This MOD Includes {mod} Features Unlocked. Download Yours Now!</strong></p>
+
+            <h2>What is {name} MOD APK?</h2>
+            {name} MOD APK is an unofficial app that provides modifications or enhancements to the normal {name} experience on Android devices. This MOD includes {mod} features unlocked, such as additional content, new levels, and premium features.
+
+            <h2>About {name}</h2>
+            {desp}
+
+            <h2>Features of {name} MOD APK</h2>
+
+            No Ads: Unlike the standard version, {name} MOD APK removes all commercial content, providing an uninterrupted experience.
+            More Features: Enjoy unlocked features and enhanced app experience.
+            {mod} Unlocked: Access premium features without any restrictions.
 
 
-        datos_download = {
-            'option': 'links',
-            'type': 'apk',
-            '0': {
-                'link': f'{dl_links}',
-                'texto': 'Download MOD'
-            },
-            'direct-link': None,
-            'direct-download': None
-        }
-        post.custom_fields.append({
-            'key': 'datos_download',
-            'value': datos_download
-        })
+            <h2>Download {name} MOD APK Latest Version</h2>
+            You can download the MOD APK file for {name} with all {mod} features unlocked from our website. This version allows you to access all the app's content without any subscription fees.
 
-        # screenshots
-        ##########################
+            To install the MOD APK file, follow these steps:
 
-        datos_imagenes = [
-            f'{ss1}=h300',
-            f'{ss2}=h300',
-            f'{ss3}=h300'
-        ]
+       <ol>
+            <li>Download the APK file from our website.</li>
+            <li>On your Android device, go to Settings &gt; Security &gt; Unknown Sources and enable installation from unknown sources.</li>
+            <li>Locate the downloaded APK file and tap on it to begin the installation.</li>
+            <li>Follow the prompts to complete the installation.</li>
+            <li>Once installed, launch {name} and log in with your account details.</li>
+        </ol>
 
-        post.custom_fields.append({
-            'key': 'datos_imagenes',
-            'value': datos_imagenes
-        })
 
-        # app_info
-        ##########################
-        datos_informacion = {
-            'app_status': None,  # new
-            'descripcion': f'{shortdesp}',
-            'version': f'{app_version}',
-            'tamano': f'{size}',
-            'fecha_actualizacion': f'{current_date}',
-            'last_update': None,
-            'requerimientos': f'{requirements}',
-            'consiguelo': f'{play_store_id}',
-            'categoria_app': 'APPS',
-            'os': 'ANDROID',
-            'offer': {
-                'amount': None,
-                'currency': 'USD'
-            },
-            'novedades': f'<p>{mod} \n {mod_info}</p>'
-        }
+            <h2>How to Install {name} MOD APK on PC</h2>
+            To install {name} MOD APK on your Windows PC, follow these steps:
+        <ol>
+            <li>Download and install BlueStacks software from a trusted source.</li>
+            <li>Download {name} MOD APK from our website.</li>
+            <li>Install the APK file using BlueStacks by following the provided steps.</li>
+            <li>Once installed, you can enjoy {name} MOD APK on your PC.</li>
+        </ol>
+            <h2>Conclusion</h2>
+            If you're looking for an unlocked version of {name}, the {name} MOD APK is a great choice. It provides access to all the app's content without any restrictions and comes with bug fixes and performance improvements for a smooth experience. Download now and enjoy!
+                                                        """
+            post.post_status = 'publish'
+            post.custom_fields = []
 
-        post.custom_fields.append({
-            'key': 'datos_informacion',
-            'value': datos_informacion
-        })
+            # dl_link
+            custom = {
+                '0': {
+                    'title': 'test',
+                    'content': 'test'
+                }
+            }
+            post.custom_fields.append({
+                'key': 'custom_boxes',
+                'value': custom
+            })
 
-        # app_yt
-        ##########################
+            datos_download = {
+                'option': 'links',
+                'type': 'apk',
+                '0': {
+                    'link': f'{dl_links}',
+                    'texto': 'Download MOD'
+                },
+                'direct-link': None,
+                'direct-download': None
+            }
+            post.custom_fields.append({
+                'key': 'datos_download',
+                'value': datos_download
+            })
 
-        datos_video = {
-            'id': yt
-        }
+            # screenshots
+            ##########################
 
-        post.custom_fields.append({
-            'key': 'datos_video',
-            'value': datos_video
-        })
+            datos_imagenes = [
+                f'{ss1}=h300',
+                f'{ss2}=h300',
+                f'{ss3}=h300'
+            ]
 
-        if is_update:
-            post.id = wp.call(posts.EditPost(existing_post_id, post))
-            return version, post.id, post.slug, img
-        else:
-            print("Asd")
-            post.id = wp.call(posts.NewPost(post))
-            return version, post.id, post.slug, img
+            post.custom_fields.append({
+                'key': 'datos_imagenes',
+                'value': datos_imagenes
+            })
+
+            # app_info
+            ##########################
+            datos_informacion = {
+                'app_status': None,  # new
+                'descripcion': f'{shortdesp}',
+                'version': f'{app_version}',
+                'tamano': f'{size}',
+                'fecha_actualizacion': f'{current_date}',
+                'last_update': None,
+                'requerimientos': f'{requirements}',
+                'consiguelo': f'{play_store_id}',
+                'categoria_app': 'APPS',
+                'os': 'ANDROID',
+                'offer': {
+                    'amount': None,
+                    'currency': 'USD'
+                },
+                'novedades': f'<p>{mod} \n {mod_info}</p>'
+            }
+
+            post.custom_fields.append({
+                'key': 'datos_informacion',
+                'value': datos_informacion
+            })
+
+            # app_yt
+            ##########################
+
+            datos_video = {
+                'id': yt
+            }
+
+            post.custom_fields.append({
+                'key': 'datos_video',
+                'value': datos_video
+            })
+
+            if is_update:
+                post.id = wp.call(posts.EditPost(existing_post_id, post))
+                return version, post.id, post.slug, img
+            else:
+                print("Asd")
+                post.id = wp.call(posts.NewPost(post))
+                return version, post.id, post.slug, img
 
 
 def wordpress_post():
@@ -425,8 +438,9 @@ def wordpress_post():
                                 json.dump(data, json_file, indent=4)
 
                         else:
-                            version, postid, slug, img = playstore_post(data, is_update=False, existing_post_id=None,
-                                                                        non_play=False)
+                            ok = playstore_post(data, is_update=False, existing_post_id=None,
+                                                non_play=True)
+                            version, postid, slug, img = ok
                             arguments = (
                                 post_title, img, post_link, requirements, overview, mod_info, dl_links, apksize,
                                 scrap_content, scrap_content, vt_scan, play_store_id, app_name)
@@ -462,8 +476,9 @@ def wordpress_post():
                                 json.dump(data, json_file, indent=4)
 
                         else:
-                            version, postid, slug, img = playstore_post(data, is_update=False, existing_post_id=None,
-                                                                        non_play=True)
+                            ok = playstore_post(data, is_update=False, existing_post_id=None,
+                                                non_play=True)
+                            version, postid, slug, img = ok
                             arguments = (
                                 post_title, img, post_link, requirements, overview, mod_info, dl_links, apksize,
                                 scrap_content, scrap_content, vt_scan, play_store_id, app_name)
@@ -479,3 +494,4 @@ def wordpress_post():
     return True
 
 
+wordpress_post()
