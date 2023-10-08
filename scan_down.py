@@ -4,6 +4,7 @@ from datetime import datetime
 import requests
 from bypass import uploadrar_direct
 import urllib.parse
+import re
 
 from selenium import webdriver
 from datetime import datetime
@@ -11,6 +12,7 @@ import os
 import json
 import requests
 import hashlib
+import virustotal_python
 
 
 def calculate_sha256(file_path):
@@ -205,13 +207,51 @@ def apk_scanner():
                         else:
                             hybrid_link = None
                     if vt_link and hybrid_link is not None:
+                        vt_status = False
+                        hybrid_status = False
+                        match = re.search(r'/file/([0-9a-f]+)/detection', vt_link)
+                        if match:
+                            identifier = match.group(1)
+                            vt_status, hybrid_status = vt_checker(identifier)
                         data["scan_vt"] = vt_link
                         data["scan_hybrid"] = hybrid_link
-                        data["vt_status"] = True
-                        data["hybird_status"] = True
+                        data["vt_status"] = vt_status
+                        data["hybrid_status"] = hybrid_status
+
                         with open(json_path, 'w') as updated_json_file:
                             json.dump(data, updated_json_file, indent=4)
                     else:
                         continue
 
+
+def vt_checker(fileid):
+    from pprint import pprint
+    FILE_ID = fileid
+    vt_status = False
+    hybrid_status = False
+    with virustotal_python.Virustotal("36572865f9503122aba76d71a98d73be5aab704f0f598460473b4b40110515a7") as vtotal:
+        resp = vtotal.request(f"files/{FILE_ID}")
+        keys_to_check = ['confirmed-timeout', 'failure', 'harmless', 'malicious', 'suspicious', 'timeout']
+        vt_status = all(resp.data['attributes']['last_analysis_stats'][key] == 0 for key in keys_to_check)
+
+    url = 'https://www.hybrid-analysis.com/api/v2/search/hash'
+    headers = {
+        'accept': 'application/json',
+        'api-key': 'xfrz86605bc99189aag4t6bx039b7875guud6fmg1bf11804bvf9htkafd8cc69a',
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+
+    data = {
+        'hash': f'{fileid}'
+    }
+
+    response = requests.post(url, headers=headers, data=data)
+    json_data = json.loads(response.text)
+    av_detect = json_data[0]["av_detect"]
+    threat_score = json_data[0]["threat_score"]
+    threat_level = json_data[0]["threat_level"]
+    verdict = json_data[0]["verdict"]
+    if av_detect == 0 and threat_level == 0 and threat_score is None and verdict == "no specific threat":
+        hybrid_status = True
+    return vt_status, hybrid_status
 
