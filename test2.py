@@ -139,28 +139,32 @@ def apk_downloader():
                 with open(json_path, 'r') as json_file:
                     data = json.load(json_file)
                     if not data["torr"]:
-                        link = data["dl_link_final"]
-                        link = uploadrar_direct(link)
-                        base_file_name = os.path.basename(link)
-                        link = requests.utils.requote_uri(link)
-                        if "uploadrar" in link:
-                            folder_name = data["app_name"] + " " + data["app_version"] + " Premium MOD Apk [APKISM.COM]"
-                            status = download_file(folder_name, link, base_file_name)
-                            if status is True:
-                                data["apk_path"] = os.path.join(os.getcwd(), day_folder, folder_name,
-                                                                base_file_name)
-                                with open(json_path, 'w') as updated_json_file:
-                                    json.dump(data, updated_json_file, indent=4)
-                            else:
-                                link = data["dl_links"]
-                                older_name = data["app_name"] + " " + data[
-                                    "app_version"] + " Premium MOD Apk [APKISM.COM]"
+                        try:
+                            link = data["dl_link_final"]
+                            link = uploadrar_direct(link)
+                            base_file_name = os.path.basename(link)
+                            link = requests.utils.requote_uri(link)
+                            if "uploadrar" in link:
+                                folder_name = data["app_name"] + " " + data["app_version"] + " Premium MOD Apk [APKISM.COM]"
                                 status = download_file(folder_name, link, base_file_name)
                                 if status is True:
                                     data["apk_path"] = os.path.join(os.getcwd(), day_folder, folder_name,
                                                                     base_file_name)
                                     with open(json_path, 'w') as updated_json_file:
                                         json.dump(data, updated_json_file, indent=4)
+                                else:
+                                    link = data["dl_links"]
+                                    folder_name = data["app_name"] + " " + data[
+                                        "app_version"] + " Premium MOD Apk [APKISM.COM]"
+                                    status = download_file(folder_name, link, base_file_name)
+                                    if status is True:
+                                        data["apk_path"] = os.path.join(os.getcwd(), day_folder, folder_name,
+                                                                        base_file_name)
+                                        with open(json_path, 'w') as updated_json_file:
+                                            json.dump(data, updated_json_file, indent=4)
+                        except Exception as e:
+                            print(e)
+                            continue
 
 
 def apk_scanner():
@@ -212,4 +216,4 @@ def apk_scanner():
                         continue
 
 
-apk_scanner()
+apk_downloader()
