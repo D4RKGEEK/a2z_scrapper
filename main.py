@@ -1,3 +1,4 @@
+import sys
 import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -7,7 +8,11 @@ from bypass import uploadrar, devuploads, a2z_apk
 import time
 from data import store_links, uploadrar_upload
 from bs4 import BeautifulSoup
+import logging
+from telegram_bot import *
 
+# Define the log file where you want to save the logs
+log_file = "logfile.log"
 
 def get_element_text(driver, by, selector):
     try:
@@ -17,13 +22,13 @@ def get_element_text(driver, by, selector):
         return None
 
 
-
 def a2z_apps():
     chrome_options = uc.ChromeOptions()
     chrome_options.headless = True
     link_list = []
     driver = uc.Chrome(options=chrome_options)
     driver.get("https://a2zapk.io/Mods/Apps/")
+
     elements = driver.find_elements(By.XPATH, '//div[@class="AppCont"]')
     for element in elements[:40]:
         ahref = element.find_element(By.TAG_NAME, "a").get_attribute("href")
@@ -34,13 +39,13 @@ def a2z_apps():
         driver.get(link)
         title = get_element_text(driver, By.XPATH,
                                  "/html/body/div[3]/section/div[1]/div[3]/div[1]/table/tbody/tr/td[2]/div[1]/h1")
-        #version_text = get_element_text(driver, By.XPATH, "/html/body/div[3]/section/div[1]/div[3]/div[2]/ul/li[9]")
-        #pattern = r'Version: (\d+\.\d+\.\d+)\s*\(([^)]*)\)'
-        #match = re.search(pattern, version_text)
-        #version, premium_value = None, None
-        #if match:
-            #version = match.group(1)
-            #premium_value = match.group(2) if match.group(2) else "Premium"
+        # version_text = get_element_text(driver, By.XPATH, "/html/body/div[3]/section/div[1]/div[3]/div[2]/ul/li[9]")
+        # pattern = r'Version: (\d+\.\d+\.\d+)\s*\(([^)]*)\)'
+        # match = re.search(pattern, version_text)
+        # version, premium_value = None, None
+        # if match:
+        # version = match.group(1)
+        # premium_value = match.group(2) if match.group(2) else "Premium"
         img_element = driver.find_element(By.XPATH,
                                           '/html/body/div[3]/section/div[1]/div[3]/div[1]/table/tbody/tr/td[1]/img')
         img_link = img_element.get_attribute('src')
@@ -70,9 +75,6 @@ def a2z_apps():
             if ok is not None:
                 dl_link = ok
 
-
-
-
         try:
             play_link = driver.find_element(By.CLASS_NAME, 'GooglePlay').find_element(By.TAG_NAME, 'a')
             play_link = play_link.get_attribute('href')
@@ -80,10 +82,10 @@ def a2z_apps():
             play_link = None
         try:
             virus_scan_link = driver.find_element(By.LINK_TEXT, 'VirusTotal scan report').get_attribute('href')
-            #print("VirusTotal Scan Report Link:", virus_scan_link)
+            # print("VirusTotal Scan Report Link:", virus_scan_link)
         except:
             virus_scan_link = None
-            #print("VirusTotal Scan Report Link:", virus_scan_link)
+            # print("VirusTotal Scan Report Link:", virus_scan_link)
             pass
         if dl_link is None:
             links = driver.find_elements(By.TAG_NAME, 'a')
@@ -107,13 +109,15 @@ def a2z_apps():
         dl_link_final = uploadrar_upload(dl_link)
         if dl_link_final is not None:
             try:
-                store_links(title, img_link, post_link, requires, "overview", app_mod_info, dl_link, dl_link_final, size, app_desp,
-                    vt_link=virus_scan_link, play_link=play_link, app_name=app_name, save_metadata=False)
+                store_links(title, img_link, post_link, requires, "overview", app_mod_info, dl_link, dl_link_final,
+                            size, app_desp,
+                            vt_link=virus_scan_link, play_link=play_link, app_name=app_name, save_metadata=False)
                 input("asd")
             except:
                 continue
-        print(app_name+"\n")
+        print(app_name + "\n")
         print("****" * 5)
     driver.quit()
+
 
 a2z_apps()
