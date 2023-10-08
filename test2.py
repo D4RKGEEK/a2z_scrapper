@@ -159,8 +159,8 @@ def apk_downloader():
                                 if status is True:
                                     data["apk_path"] = os.path.join(os.getcwd(), day_folder, folder_name,
                                                                     base_file_name)
-                                with open(json_path, 'w') as updated_json_file:
-                                    json.dump(data, updated_json_file, indent=4)
+                                    with open(json_path, 'w') as updated_json_file:
+                                        json.dump(data, updated_json_file, indent=4)
 
 
 def apk_scanner():
