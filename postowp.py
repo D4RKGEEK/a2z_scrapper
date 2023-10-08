@@ -494,4 +494,3 @@ def wordpress_post():
     return True
 
 
-wordpress_post()
