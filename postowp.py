@@ -15,10 +15,16 @@ import os, json
 from data import non_play_content_parser
 from data import *
 
+current_date = datetime.now().strftime("%b, %d, %Y")
+
 
 def parse_version(version_string):
     return tuple(map(int, version_string.split('.')))
 
+def youtube_parser(url):
+    reg_exp = r'^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*'
+    match = re.match(reg_exp, url)
+    return match.group(7) if match and len(match.group(7)) == 11 else False
 
 def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
     meaningful_id = data["id"]
@@ -50,7 +56,6 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         wp_username = "test"
         wp_password = "test"
         wp = Client(wp_url, wp_username, wp_password)
-        print(wp)
         post = WordPressPost()
         data = {
             'name': f'{name} + MOD APK.jpg',
@@ -65,82 +70,62 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         title = post_title
         thumbnail_url = (response["url"])
         post.slug = slugify(name + " Mod APK")
+        catergory = "3rd Party Mods"
         post.terms_names = {
-            'post_tag': ['tagA', 'another tag'],
-            'category': [f'{cat}'],
+            'post_tag': [name + " Mod"],
+            'category': [f'{catergory}'],
         }
-        print(post.terms_names)
 
         cat_link = slugify(cat)
         desp = scrap_content
         post.content = f"""
-                            <p style="text-align: center;"><strong><h1> {title} </h1></strong></p>
+                          <h1 style="text-align: center;">{title}</h1>
 
-                            <p style="text-align: center;"><strong>Download The Latest Apk Version of {name} MOD, A <a href="https://apkism.com/category/{cat_link}">{cat}</a> App For Android Device. This MOD Includes {mod} Features Unlocked. Download Yours Now!</strong></p>
+ <p style="text-align: center;"><strong>Download The Latest Apk Version of {name} MOD, A <a href="https://apkism.com/category/{cat_link}">{cat}</a> App For Android Device. This MOD Includes {mod} Features Unlocked. Download Yours Now!</strong></p>
 
-                            <h2>What Is {name} MOD APK</h2>
-                            <img class="aligncenter" src="{thumbnail_url}" alt="{name} MOD Apk" width="220" height="220" />
+<h2>What is {name} MOD APK?</h2>
+{name} MOD APK is an unofficial app that provides modifications or enhancements to the normal {name} experience on Android devices. This MOD includes {mod} features unlocked, such as additional content, new levels, and premium features.
 
-                            <strong>{name} Mod APK</strong> : A {name} MOD (mobile application) APK is an unofficial app that provides modifications or "enhancements" to the normal {name} experience on Android devices. These mods can include adding new content, new features and some functions unlocked that provides premium or paid subscription.
+<h2>About {name}</h2>
+{desp}
 
-                            A mod apk is an app that has been modified or "unlocked" to allow access to {mod} features. These features can include additional content, new levels, bonus items, and more. Why would I want to unlock a mod apk?
+<h2>Features of {name} MOD APK</h2>
 
-                            There are a number of reasons. For example, some people like to use {mod} features because they feel they get better value for their money. Others might want extra help in retrieving coins or gems that are hidden in the game. And still others may just enjoy playing with upgraded versions of the game objects or graphics. In any case, unlocking mods provides another way for users to customize and enhance their experience on mobile apps.
+No Ads: Unlike the standard version, {name} MOD APK removes all commercial content, providing an uninterrupted experience.
+More Features: Enjoy unlocked features and enhanced app experience.
+{mod} Unlocked: Access premium features without any restrictions.
 
-                            <h2>Features of {name} Mod APK</h2>
-                            The popularity of {name} <strong>{version}</strong> MOD APK has exploded in recent years due to its numerous benefits over the standard version of the {name} apk.
 
-                            <strong>No ads</strong>: Unlike the standard version of the {name} apk, which features intrusive advertising throughout in app, {name} Latest MOD APK Download removes all commercial content. This means that you can use this app without ever being interrupted by annoying commercials.
+<h2>Download {name} MOD APK Latest Version</h2>
+You can download the MOD APK file for {name} with all {mod} features unlocked from our website. This version allows you to access all the app's content without any subscription fees.
 
-                            <strong>More Features:</strong> With no ads comes more choice - you can use this app with unlocked features unlocked.
+To install the MOD APK file, follow these steps:
 
-                            <strong>Enhanced App experience:</strong> Since there are no interruptions between scenes thanks to ad removal, using {name} APK MOD feels much smoother and faster than using the regular {name} MOD APK {version}.
+Download the APK file from our website.
+On your Android device, go to Settings > Security > Unknown Sources and enable installation from unknown sources.
+Locate the downloaded APK file and tap on it to begin the installation.
+Follow the prompts to complete the installation.
+Once installed, launch {name} and log in with your account details.
+<h2>How to Install {name} MOD APK on PC</h2>
+To install {name} MOD APK on your Windows PC, follow these steps:
 
-                            <strong>{mod} Unlocked</strong> : If you've ever tried to use a {mod} feature on <strong>{name} mod download</strong> and found that it was blocked or not available Most apps restrict access to premium features only to those who have paid for them.
-
-                            {desp}
-                            <h2>Download {name} MOD APK Latest Version</h2>
-                            If you're looking for a MOD APK file for {name}, you can find it here. This particular version of the {name} apk is unlocked {mod} Features, meaning you'll have access to all of the app's content without having to pay for a subscription.
-
-                            To install the MOD APK file, simply download it and then open it up in your preferred File Manager app. Once it's been installed, you should be able to launch {name} and log in with your account details. Enjoy!
-                            <h2>How To Install {name} Mod Apk Download</h2>
-                            Fortunately, there’s a way to get {name} for free. There are many {name} mod apk download available online, but we recommend using the one from our site. It’s safe and easy to use, and it will unlock all of {name} features for you.
-
-                            To install the <strong>Download {name} mod apk</strong>, just follow these simple steps:
-
-                            1. Download the apk file from our site.
-
-                            2. On your Android device, go to Settings &gt; Security &gt; Unknown Sources and turn on Unknown Sources. This will allow you to install apps from outside of the Google Play Store.
-
-                            3. Find the downloaded apk file and tap on it to begin installation.
-
-                            4. Follow the prompts to finish installation.
-
-                            5. That’s it! You now have access to all of {name} features for free!
-                            <h2 class="ac">Download {name} Mod APK For PC</h2>
-                            You can download the <strong>{name} Mod APK </strong>on the Windows PC with the following simple steps:
-                            <ol>
-                                <li>Download Bluestacks software online by downloading it from any third-party source.</li>
-                                <li>Install BlueStacks In Your PC.</li>
-                                <li>Download {name} MOD APK From Our Website In Bluestacks.</li>
-                                <li>Install The .APK File By Steps Provided Above.</li>
-                                <li>Once it completes, you can start enjoying {name} mod apk for pc!</li>
-                            </ol>
-                            <h2>Conclusion</h2>
-                            If you're looking for an unlocked version of {name}, the {name} {version} MOD APK is a great option. With this download, you'll be able to access all of {name} content without any restrictions. Plus, the MOD APK comes with a number of bug fixes and performance improvements, so you can enjoy a smooth and uninterrupted experience.
+Download and install BlueStacks software from a trusted source.
+Download {name} MOD APK from our website.
+Install the APK file using BlueStacks by following the provided steps.
+Once installed, you can enjoy {name} MOD APK on your PC.
+<h2>Conclusion</h2>
+If you're looking for an unlocked version of {name}, the {name} MOD APK is a great choice. It provides access to all the app's content without any restrictions and comes with bug fixes and performance improvements for a smooth experience. Download now and enjoy!
                                             """
         post.post_status = 'publish'
         post.custom_fields = []
 
-        #dl_link
-        ##########################
 
         datos_download = {
             'option': 'links',
             'type': 'apk',
             '0': {
                 'link': f'{dl_links}',
-                'texto': 'Download MOD Apk'
+                'texto': 'Download MOD'
             },
             'direct-link': None,
             'direct-download': None
@@ -150,35 +135,14 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
             'value': datos_download
         })
 
-        #screenshots
-        ##########################
-
-        datos_imagenes = [
-            'app_image1',
-            'app_image1',
-            'app_image1',
-            'app_image1',
-            'app_image1',
-            None,
-            None,
-            None,
-            None,
-            None
-        ]
-
-        post.custom_fields.append({
-            'key': 'datos_imagenes',
-            'value': datos_imagenes
-        })
-
-        #app_info
+        # app_info
         ##########################
         datos_informacion = {
-            'app_status': 'updated', #new
-            'descripcion': 'app_desp_short',
+            'app_status': None,  # new
+            'descripcion': f'',
             'version': f'{app_version}',
             'tamano': f'{size}',
-            'fecha_actualizacion': 'app_updated',
+            'fecha_actualizacion': f'{current_date}',
             'last_update': None,
             'requerimientos': f'{requirements}',
             'consiguelo': f'{play_store_id}',
@@ -188,36 +152,13 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
                 'amount': None,
                 'currency': 'USD'
             },
-            'novedades': f'<p>BUG FIXES</p>'
+            'novedades': f'<p>{mod} \n {mod_info}</p>'
         }
 
         post.custom_fields.append({
             'key': 'datos_informacion',
             'value': datos_informacion
         })
-
-        #app_yt
-        ##########################
-
-        datos_video = {
-            'id': 'app_yd_id'
-        }
-
-        post.custom_fields.append({
-            'key': 'datos_video',
-            'value': datos_video
-        })
-
-        post.custom_fields.append({
-            'key': 'new_rating_average',
-            'value': "4.5"
-        })
-        post.custom_fields.append({
-            'key': 'new_rating_count',
-            'value': "users"
-        })
-
-
 
 
         if is_update:
@@ -226,7 +167,8 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
             return version, post.id, post.slug, img_link
         else:
             post.id = wp.call(posts.NewPost(post))
-        return version, post.id, post.slug, img_link
+            print(post.id)
+            return version, post.id, post.slug, img_link
 
 
     if str(play_store_id).startswith("http"):
@@ -248,10 +190,15 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         img = result["icon"] + "=s200-rw"
         playstore_link = result["url"]
         video = result["video"]
+        screenshots = result["screenshots"]
+        ss1 = screenshots[1]
+        ss2 = screenshots[2]
+        ss3 = screenshots[3]
+
+
         if video is not None:
-            yt = video[32:44]
-        else:
-            yt = ""
+            yt = youtube_parser(video)
+
         banner = result["headerImage"]
         dev = result["developer"]
         shortdesp = result["summary"]
@@ -266,14 +213,13 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         installs = result['installs']
         play_id = result['appId']
         vote = result['score']
+
         wp_url = "https://apkism.com/xmlrpc.php"
         wp_username = "test"
         wp_password = "test"
         wp = Client(wp_url, wp_username, wp_password)
         post = WordPressPost()
         img2 = requests.get(result["icon"] + "=s200-rw")
-        print(img2)
-
         data = {
             'name': f'{name} + MOD APK.jpg',
             'type': 'image/jpeg',
@@ -295,73 +241,70 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         desp = scrap_content
 
         post.content = f"""
-                    <p style="text-align: center;"><strong><h1> {title} </h1></strong></p>
+                                  <h1 style="text-align: center;">{title}</h1>
 
-                    <p style="text-align: center;"><strong>Download The Latest Apk Version of {name} MOD, A <a href="https://apkism.com/category/{cat_link}">{cat}</a> App For Android Device. This MOD Includes {mod} Features Unlocked. Download Yours Now!</strong></p>
+         <p style="text-align: center;"><strong>Download The Latest Apk Version of {name} MOD, A <a href="https://apkism.com/category/{cat_link}">{cat}</a> App For Android Device. This MOD Includes {mod} Features Unlocked. Download Yours Now!</strong></p>
 
-                    <h2>What Is {name} MOD APK</h2>
-                    <img class="aligncenter" src="{thumbnail_url}" alt="{name} MOD Apk" width="220" height="220" />
+        <h2>What is {name} MOD APK?</h2>
+        {name} MOD APK is an unofficial app that provides modifications or enhancements to the normal {name} experience on Android devices. This MOD includes {mod} features unlocked, such as additional content, new levels, and premium features.
 
-                    <strong>{name} Mod APK</strong> : A {name} MOD (mobile application) APK is an unofficial app that provides modifications or "enhancements" to the normal {name} experience on Android devices. These mods can include adding new content, new features and some functions unlocked that provides premium or paid subscription.
+        <h2>About {name}</h2>
+        {desp}
 
-                    A mod apk is an app that has been modified or "unlocked" to allow access to {mod} features. These features can include additional content, new levels, bonus items, and more. Why would I want to unlock a mod apk?
+        <h2>Features of {name} MOD APK</h2>
 
-                    There are a number of reasons. For example, some people like to use {mod} features because they feel they get better value for their money. Others might want extra help in retrieving coins or gems that are hidden in the game. And still others may just enjoy playing with upgraded versions of the game objects or graphics. In any case, unlocking mods provides another way for users to customize and enhance their experience on mobile apps.
+        No Ads: Unlike the standard version, {name} MOD APK removes all commercial content, providing an uninterrupted experience.
+        More Features: Enjoy unlocked features and enhanced app experience.
+        {mod} Unlocked: Access premium features without any restrictions.
 
-                    <h2>Features of {name} Mod APK</h2>
-                    The popularity of {name} <strong>{version}</strong> MOD APK has exploded in recent years due to its numerous benefits over the standard version of the {name} apk.
 
-                    <strong>No ads</strong>: Unlike the standard version of the {name} apk, which features intrusive advertising throughout in app, {name} Latest MOD APK Download removes all commercial content. This means that you can use this app without ever being interrupted by annoying commercials.
+        <h2>Download {name} MOD APK Latest Version</h2>
+        You can download the MOD APK file for {name} with all {mod} features unlocked from our website. This version allows you to access all the app's content without any subscription fees.
 
-                    <strong>More Features:</strong> With no ads comes more choice - you can use this app with unlocked features unlocked.
+        To install the MOD APK file, follow these steps:
 
-                    <strong>Enhanced App experience:</strong> Since there are no interruptions between scenes thanks to ad removal, using {name} APK MOD feels much smoother and faster than using the regular {name} MOD APK {version}.
-
-                    <strong>{mod} Unlocked</strong> : If you've ever tried to use a {mod} feature on <strong>{name} mod download</strong> and found that it was blocked or not available Most apps restrict access to premium features only to those who have paid for them.
-
-                    {desp}
-                    <h2>Download {name} MOD APK Latest Version</h2>
-                    If you're looking for a MOD APK file for {name}, you can find it here. This particular version of the {name} apk is unlocked {mod} Features, meaning you'll have access to all of the app's content without having to pay for a subscription.
-
-                    To install the MOD APK file, simply download it and then open it up in your preferred File Manager app. Once it's been installed, you should be able to launch {name} and log in with your account details. Enjoy!
-                    <h2>How To Install {name} Mod Apk Download</h2>
-                    Fortunately, there’s a way to get {name} for free. There are many {name} mod apk download available online, but we recommend using the one from our site. It’s safe and easy to use, and it will unlock all of {name} features for you.
-
-                    To install the <strong>Download {name} mod apk</strong>, just follow these simple steps:
-
-                    1. Download the apk file from our site.
-
-                    2. On your Android device, go to Settings &gt; Security &gt; Unknown Sources and turn on Unknown Sources. This will allow you to install apps from outside of the Google Play Store.
-
-                    3. Find the downloaded apk file and tap on it to begin installation.
-
-                    4. Follow the prompts to finish installation.
-
-                    5. That’s it! You now have access to all of {name} features for free!
-                    <h2 class="ac">Download {name} Mod APK For PC</h2>
-                    You can download the <strong>{name} Mod APK </strong>on the Windows PC with the following simple steps:
-                    <ol>
-                        <li>Download Bluestacks software online by downloading it from any third-party source.</li>
-                        <li>Install BlueStacks In Your PC.</li>
-                        <li>Download {name} MOD APK From Our Website In Bluestacks.</li>
-                        <li>Install The .APK File By Steps Provided Above.</li>
-                        <li>Once it completes, you can start enjoying {name} mod apk for pc!</li>
-                    </ol>
-                    <h2>Conclusion</h2>
-                    If you're looking for an unlocked version of {name}, the {name} {version} MOD APK is a great option. With this download, you'll be able to access all of {name} content without any restrictions. Plus, the MOD APK comes with a number of bug fixes and performance improvements, so you can enjoy a smooth and uninterrupted experience.
-                                    """
+   <ol>
+        <li>Download the APK file from our website.</li>
+        <li>On your Android device, go to Settings &gt; Security &gt; Unknown Sources and enable installation from unknown sources.</li>
+        <li>Locate the downloaded APK file and tap on it to begin the installation.</li>
+        <li>Follow the prompts to complete the installation.</li>
+        <li>Once installed, launch {name} and log in with your account details.</li>
+    </ol>
+        
+        
+        <h2>How to Install {name} MOD APK on PC</h2>
+        To install {name} MOD APK on your Windows PC, follow these steps:
+    <ol>
+        <li>Download and install BlueStacks software from a trusted source.</li>
+        <li>Download {name} MOD APK from our website.</li>
+        <li>Install the APK file using BlueStacks by following the provided steps.</li>
+        <li>Once installed, you can enjoy {name} MOD APK on your PC.</li>
+    </ol>
+        <h2>Conclusion</h2>
+        If you're looking for an unlocked version of {name}, the {name} MOD APK is a great choice. It provides access to all the app's content without any restrictions and comes with bug fixes and performance improvements for a smooth experience. Download now and enjoy!
+                                                    """
         post.post_status = 'publish'
         post.custom_fields = []
 
         # dl_link
-        ##########################
+        custom = {
+            '0': {
+                'title': 'test',
+                'content': 'test'
+            }
+        }
+        post.custom_fields.append({
+            'key': 'custom_boxes',
+            'value': custom
+        })
+
 
         datos_download = {
             'option': 'links',
             'type': 'apk',
             '0': {
                 'link': f'{dl_links}',
-                'texto': 'Download MOD Apk'
+                'texto': 'Download MOD'
             },
             'direct-link': None,
             'direct-download': None
@@ -375,16 +318,9 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         ##########################
 
         datos_imagenes = [
-            'app_image1',
-            'app_image1',
-            'app_image1',
-            'app_image1',
-            'app_image1',
-            None,
-            None,
-            None,
-            None,
-            None
+            f'{ss1}=h300',
+            f'{ss2}=h300',
+            f'{ss3}=h300'
         ]
 
         post.custom_fields.append({
@@ -395,11 +331,11 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         # app_info
         ##########################
         datos_informacion = {
-            'app_status': 'updated',  # new
-            'descripcion': 'app_desp_short',
+            'app_status': None,  # new
+            'descripcion': f'{shortdesp}',
             'version': f'{app_version}',
             'tamano': f'{size}',
-            'fecha_actualizacion': 'app_updated',
+            'fecha_actualizacion': f'{current_date}',
             'last_update': None,
             'requerimientos': f'{requirements}',
             'consiguelo': f'{play_store_id}',
@@ -409,7 +345,7 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
                 'amount': None,
                 'currency': 'USD'
             },
-            'novedades': f'<p>BUG FIXES</p>'
+            'novedades': f'<p>{mod} \n {mod_info}</p>'
         }
 
         post.custom_fields.append({
@@ -421,7 +357,7 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
         ##########################
 
         datos_video = {
-            'id': 'app_yd_id'
+            'id': yt
         }
 
         post.custom_fields.append({
@@ -429,23 +365,13 @@ def playstore_post(data, is_update=False, existing_post_id=None, non_play=True):
             'value': datos_video
         })
 
-        post.custom_fields.append({
-            'key': 'new_rating_average',
-            'value': "4.5"
-        })
-        post.custom_fields.append({
-            'key': 'new_rating_count',
-            'value': "users"
-        })
-
         if is_update:
             post.id = wp.call(posts.EditPost(existing_post_id, post))
             return version, post.id, post.slug, img
         else:
+            print("Asd")
             post.id = wp.call(posts.NewPost(post))
-        return version, post.id, post.slug, img
-    else:
-        print("NON PLAY")
+            return version, post.id, post.slug, img
 
 
 def wordpress_post():
@@ -553,4 +479,3 @@ def wordpress_post():
     return True
 
 
-print(wordpress_post())
