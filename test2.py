@@ -183,7 +183,6 @@ def apk_scanner():
                     data = json.load(json_file)
                     apk_path = data["apk_path"]
                     vt_link = data["scan_vt"]
-
                     if vt_link is not None:
                         if "virustotal" in vt_link:
                             print("vt")
@@ -216,4 +215,3 @@ def apk_scanner():
                         continue
 
 
-apk_downloader()
