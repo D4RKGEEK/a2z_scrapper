@@ -95,7 +95,7 @@ def hybrid_analysis(file_name):
 
         files = {
             'file': open(f'{file_name}', 'rb'),
-            'environment_id': (None, '160'),
+            'environment_id': (None, '200'),
         }
 
         response = requests.post('https://www.hybrid-analysis.com/api/v2/submit/file', headers=headers, files=files)
@@ -187,7 +187,6 @@ def apk_scanner():
                     vt_link = data["scan_vt"]
                     if vt_link is not None:
                         if "virustotal" in vt_link:
-                            print("vt")
                             vt_link = vt_link
                             hybrid_link = hybrid_analysis(apk_path)
                             if vt_link is not None:
@@ -225,6 +224,7 @@ def apk_scanner():
 
 
 def vt_checker(fileid):
+    print(fileid)
     from pprint import pprint
     FILE_ID = fileid
     vt_status = False
@@ -233,25 +233,26 @@ def vt_checker(fileid):
         resp = vtotal.request(f"files/{FILE_ID}")
         keys_to_check = ['confirmed-timeout', 'failure', 'harmless', 'malicious', 'suspicious', 'timeout']
         vt_status = all(resp.data['attributes']['last_analysis_stats'][key] == 0 for key in keys_to_check)
+    print(vt_status)
 
-    url = 'https://www.hybrid-analysis.com/api/v2/search/hash'
+    url = f'https://www.hybrid-analysis.com/api/v2/overview/{fileid}'
     headers = {
         'accept': 'application/json',
         'api-key': 'xfrz86605bc99189aag4t6bx039b7875guud6fmg1bf11804bvf9htkafd8cc69a',
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 
-    data = {
-        'hash': f'{fileid}'
-    }
 
-    response = requests.post(url, headers=headers, data=data)
-    json_data = json.loads(response.text)
-    av_detect = json_data[0]["av_detect"]
-    threat_score = json_data[0]["threat_score"]
-    threat_level = json_data[0]["threat_level"]
-    verdict = json_data[0]["verdict"]
-    if av_detect == 0 and threat_level == 0 and threat_score is None and verdict == "no specific threat":
+    response = requests.get(url, headers=headers)
+    data = json.loads(response.text)
+    virustotal_scanners = [scanner for scanner in data['scanners'] if scanner['name'] == 'VirusTotal']
+    metadefender_scanners = [scanner for scanner in data['scanners'] if scanner['name'] == 'Metadefender']
+    virustotal_scanners_v2 = data['scanners_v2']['virustotal']
+    metadefender_scanners_v2 = data['scanners_v2']['metadefender']
+    if virustotal_scanners[0]['status'] == 'clean' and metadefender_scanners[0]['status'] == 'clean' and virustotal_scanners_v2['status'] == 'clean' and metadefender_scanners_v2['status'] == 'clean':
         hybrid_status = True
+    else:
+        hybrid_status = False
     return vt_status, hybrid_status
 
+apk_scanner()

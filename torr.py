@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import glob
 import zipfile
+from imageapi import search_image
 import json
 from google_play_scraper import app
 from slugify import slugify
@@ -24,7 +25,7 @@ from io import BytesIO
 import undetected_chromedriver as uc
 
 chat_id = 697046197
-BOT_TOKEN = '6094110235:AAFtv9xohmShh3m34jP7VVCZAfFyQLLSCno'
+BOT_TOKEN = '6650813114:AAE9tPYGvu0ult91gqNJ00ZKx4kAj9qlZT8'
 bot = telepot.Bot(BOT_TOKEN)
 
 status_check = None
@@ -48,39 +49,6 @@ def capture_screenshot_and_send(chat_id, link, name):
 
     return status_check
 
-
-def check_app(app_name):
-    layout = [
-        [sg.Text(f"Do you want to upload to torrent? {app_name}?")],
-        [sg.Button("Yes"), sg.Button("No")]
-    ]
-
-    window = sg.Window("Upload Confirmation", layout)
-
-    while True:
-        event, _ = window.read()
-
-        if event in (sg.WINDOW_CLOSED, "No"):
-            return False
-        elif event == "Yes":
-            return True
-
-
-def confirm_check(app_name):
-    layout = [
-        [sg.Text(f"Do you want to continue {app_name}?")],
-        [sg.Button("Yes"), sg.Button("No")]
-    ]
-
-    window = sg.Window("Upload Confirmation", layout)
-
-    while True:
-        event, _ = window.read()
-
-        if event in (sg.WINDOW_CLOSED, "No"):
-            return False
-        elif event == "Yes":
-            return True
 
 
 def credit_giver():
@@ -350,14 +318,14 @@ if __name__ == '__main__':
                             driver.get(vt_link)
                             sleep(2)
                             vt_status = capture_screenshot_and_send("697046197", vt_link, app_name)
-                            print(vt_status)
                             if vt_status is True:
-                                if hybrid is not None:
+                                if hybrid:
                                     driver.get(hybrid)
                                     sleep(2)
                                     hybrid_status = capture_screenshot_and_send("697046197", hybrid, app_name)
-                                if hybrid is None:
-                                    hybird_status = True
+                                else:
+                                    hybrid_status = True
+                                    hybrid = "NA"
 
                         if final_link or vt_status and hybrid_status is True:
                             scrap_content = data["scrap_content"]
@@ -413,7 +381,8 @@ if __name__ == '__main__':
                                 telegram = "\n[center][b]Telegram:[/b][url=https://t.me/apkism_main]Click Here[/url][/center]\n\n"
                                 second = f"[img]{image}[/img]\n [b]Name : {app_name} \n [b]Size : {size}MB [/b] \n [b]Version : {version} [/b]\n [b]Category : {cat} [/b] \n [b]Developer : {dev}[/b] \n [b]Mod : {mod}[/b] \n \nThis app has no advertisment. \n\n [b]{name} Info : {summary} \n\n [b]{name} What's New : {wpnew}\n\n"
                                 third = f" How To Install?. [/b] [Please Check Website For Games With OBB Files]\n\n[b] Step 1. [/b] Like any additional APK file you sideload this, and you can start doing that by first Downloading {name} Torrent APK file.\n\n[b]Step 2.[/b] Next, go to your File Explorer and browse {name} MOD APK file.\n\n[b]Step 3.[/b] Once you locate the {name} APK file, tap on it, and hit the install button.\n\n[b]Step 4.[/b] It will start installing, and once done, open {name}.\n\n[b]Step 5.[/b] This will be PreMODDED It will ask you for an account, enter the correct details (if asked).\n\n[b]Step 6.[/b] And that’s it you’re done, all the {mod} features will be available for you.\n\n[b]NOTE:[/b] if you faced any error like app not install then please uninstall the previously installed app and then you can easily install the MOD on your device.\n\n[b][color=red]EVERY MOD EXPIRES AFTER A TIME SO IF THE MOD ISN'T WORKING PLEASE WAIT FOR NEW RELESE AND FEEL FREE TO DROP ME A PM FOR ANY HELP.[/color][/b]"
-                                desc = first + telegram + second + third + "\n\nHybrid Analysis : " + hybrid + "\n\n VirusTotal Analysis : " + vt_link
+                                desc = first + telegram + second + third + "\n\nHybrid Analysis : " + str(
+                                    hybrid) + "\n\nVirusTotal Analysis : " + str(vt_link)
                                 second1 = f"Name : {name} \n [b]Size : {size}MB [/b] \n [b]Version : {version} [/b]\n \n [b]Mod : {app}[/b] \n \nThis app has no advertisment. \n\n [b]{name} Info : {summary} \n\n [b]{name} What's New : {wpnew}\n\n"
                                 desc1 = first + telegram + second1 + third + "\n\nHybrid Analysis : " + hybrid + "\n\n VirusTotal Analysis : " + vt_link
                                 folder = data["apk_path"]
